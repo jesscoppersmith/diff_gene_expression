@@ -23,7 +23,7 @@ OUTPUT=/home/jcoppersmith/data/src/diff_gene_exp/S4_DGE/gffcompare_out
 GFF_IN=/home/jcoppersmith/data/src/reference_genomes/S4Sm_genomic.gff
 
 
-gffcompare -r $GFF_IN -G -o $OUTPUT/S4_merged -i $MERGELIST
+gffcompare -r $GFF_IN -o $OUTPUT/S4_merged -i $MERGELIST
 	# echo "gffcompare complete" $(date)
 	# -o specifies prefix to use for output files
 	# -r followed by the annotation file to use as a reference
