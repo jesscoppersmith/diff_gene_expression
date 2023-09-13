@@ -4,7 +4,7 @@
 # Contents
 
 ### [Scripts](S4/Scripts/)
-01_trimmomatic-[01_trimmomatic_array.sh](/Users/jess/Documents/Grad_School/Research/diff_gene_expression/RE22/scripts/01_trimmomatic_array.sh) \
+01_trimmomatic-[01_trimmomatic_array.sh](S4/scripts/01_trimmomatic_array.sh) \
 02_hisat2_build-[02_hisat2_build.sh](S4/scripts/02_hisat2_build.sh) \
 03_hisat2_align-[03_hisat2_align_array.sh](S4/scripts/03_hisat2_align_array.sh) \
 04_samtools-sort-[04_samtools-sort_array.sh](S4/scripts/04_samtools-sort_array.sh) \
