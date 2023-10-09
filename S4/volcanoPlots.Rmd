@@ -1,0 +1,61 @@
+---
+title: "S4 Diff Expression Volcano Plots"
+author: "Jessica"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+Volcano plots of DESeq2 differential gene expression analysis for S4 samples in competition with RE22
+
+# Load packages
+
+```{r packages, message=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(DESeq2)
+library(data.table)
+library(dplyr)
+library(tidyr)
+library(reshape2)
+library(devtools)
+library(ggplot2)
+library(ggrepel)
+library(ggfortify)
+library(cluster)
+library(data.table)
+
+```
+
+Load file
+
+```{r loaddata}
+
+#Bring data in
+S4bio_AllSigGenes <-as.data.frame(read.csv("sig_geneIDs_S4bio_annotated.csv"))
+head(S4bio_AllSigGenes)
+```
+
+Create custom colors and names for plots
+
+```{r set up plot}
+#Add color to points by first creating a color scale
+graphcolors <- c("darkcyan", "gray", "darkorange3")
+names(graphcolors)<- c("Down", "No Change", "Up")  
+
+#Add gene descriptions to graph
+ggplot(S4bio_AllSigGenes, aes(x=log2FoldChange, y=-log10(padj), col=diffexpressed, label=X)) + 
+  geom_point()+
+  theme_minimal()+
+  geom_vline(xintercept=c(-1, 1), col="black") +
+  geom_hline(yintercept=-log10(0.05), col="black")+
+  scale_color_manual(values=graphcolors)+
+  labs(col = "Change in Expression", title = "Differentially Expressed in S4 Biofilm")+
+  geom_label_repel(max.overlaps = 2000, size=7)+ #max.overlaps changes the number of points that can be obscured by a label
+  theme(legend.title = element_text(size = 25))+ # Legend title
+  theme(legend.text = element_text(size = 20))+ # Legend text
+  theme(plot.title = element_text(size = 25))+ #Title text
+  theme(axis.title.y = element_text(size = 25))+ # y-axis title
+  theme(axis.title.x = element_text(size = 25))+ # x-axis title
+  theme(axis.text = element_text(size = 15))
+
+```

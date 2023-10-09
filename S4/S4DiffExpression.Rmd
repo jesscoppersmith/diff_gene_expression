@@ -32,7 +32,7 @@ library(data.table)
 
 load transcript count matrix and metadatata 
 phenodata.csv file contains metadata on the count table's samples that you create separately
-Make sure PHENODATA is in the same order or these commands will change data to be wrong!!!!###
+Make sure PHENODATA is in the same order or these commands will change data to be wrong!!!!
 
 ```{r loaddata}
 
@@ -40,6 +40,10 @@ Make sure PHENODATA is in the same order or these commands will change data to b
 S4_TranColData <- read.csv("phenodata.csv", header=TRUE, sep=",") %>% 
    # add column with technical replicate number based on SampleID column
    separate_wider_delim(sampleID, names=c("BioRep", "TechRep"), delim="_", cols_remove = FALSE)
+head(S4_TranColData)
+
+#Add column "group" with merged location and condition
+S4_TranColData <- S4_TranColData %>% unite("group", c("location", "condition"), sep = "_", remove = FALSE)
 head(S4_TranColData)
 
 #Load transcript count data
@@ -73,7 +77,7 @@ all(rownames(S4_TranColData) == colnames(S4_TranscriptCountData))    # should re
 #Set up the data matrix for S4 sample analysis in DESeq
 ddsS4 <- DESeqDataSetFromMatrix(countData = S4_TranscriptCountData, 
                                   colData = S4_TranColData, 
-                                  design =  ~ condition)
+                                  design =  ~ group)
 colData(ddsS4)
 colnames(ddsS4)
 
@@ -103,6 +107,60 @@ colnames(ddsS4collapse)
 
 ```
 
+## Results for Biofilm Samples
+
+```{r resdeseqBiofilm}
+
+# Running DESeq
+
+ddsS4collapse <- DESeq(ddsS4collapse)
+
+# Results for Biofilm
+resBiofilm <- results(ddsS4collapse, contrast=c("group", "biofilm_control", "biofilm_treatment"))
+head(resBiofilm)         
+
+alpha <- 0.05 #set alpha to 0.05, this will control FDR (FDR = adjusted p-value cutoff)
+summary(resBiofilm, alpha) #now showing all genes with FRD < 0.05
+
+#To get the significant genes
+#The independent filtering in results() has an argument 'alpha'
+#which is used to optimize a cutoff on mean normalized count
+#to maximize the number of genes with padj < alpha
+
+#make a column with the set alpha value of 0.05, and save it as a new variable
+resBiofilm_05 <- results(ddsS4collapse, alpha=alpha, contrast=c("group", "biofilm_control", "biofilm_treatment"))
+head(resBiofilm_05)
+
+#Collect the genes that have values lower than the alpha value of 0.05
+resBiofilm_05_sig <- resBiofilm_05[which(resBiofilm_05$padj < alpha),]
+head(resBiofilm_05_sig)
+
+summary(resBiofilm_05_sig) #this is the significant ones only!
+
+sig_geneIDs_S4bio <- DataFrame(resBiofilm_05_sig)
+
+# Save significant S4 biofilm gene IDs to a .csv file
+write.csv(sig_geneIDs_S4bio, file = "sig_geneIDs_S4bio.csv")
+
+                      
+```
+
+Add columns to identify if genes are differentially expressed, and if so are they up or down regulated.
+
+```{r data identification}
+
+# add a column of NAs to data
+sig_geneIDs_S4bio$diffexpressed <- "No Change"
+head(sig_geneIDs_S4bio)
+# if log2Foldchange > 1 and padj < 0.05, set as "UP" 
+sig_geneIDs_S4bio$diffexpressed[sig_geneIDs_S4bio$log2FoldChange > 1 & sig_geneIDs_S4bio$padj < 0.05] <- "Up"
+head(sig_geneIDs_S4bio)
+# if log2Foldchange < -1 and pvalue < 0.05, set as "DOWN"
+sig_geneIDs_S4bio$diffexpressed[sig_geneIDs_S4bio$log2FoldChange < -1 & sig_geneIDs_S4bio$padj < 0.05] <- "Down"      
+
+#save as a csv file
+write.csv(sig_geneIDs_S4bio, file = "sig_geneIDs_S4bio_annotated.csv")
+```
 
 # Session info
 

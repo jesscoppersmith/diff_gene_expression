@@ -15,7 +15,7 @@
 09_StringTie-e-[09_StringTie-e_array.sh](S4/scripts/09_StringTie-e_array.sh) \
 10_prepDE-[10_prepDE.sh](S4/scripts/10_prepDE.sh)
 
-### [Output](output/)
+
 ------------------------------------------------------------------------------------------------------------------------------
 
 # Overall pipeline
@@ -34,3 +34,7 @@ Work based on the Ballgown suite https://github.com/alyssafrazee/ballgown and DE
 9. Create merged GTF file for all non-redundant transcripts (gffCompare)
 10. Estimate coverage of merged GTF file (stringTie -e)
 11. Prep for differential expression (python script)
+
+__________________________________________________________________________________________________________________________
+
+### [Output](output/)
