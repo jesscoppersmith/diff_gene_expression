@@ -116,7 +116,7 @@ colnames(ddsS4collapse)
 ddsS4collapse <- DESeq(ddsS4collapse)
 
 # Results for Biofilm
-resBiofilm <- results(ddsS4collapse, contrast=c("group", "biofilm_control", "biofilm_treatment"))
+resBiofilm <- results(ddsS4collapse, contrast=c("group", "biofilm_treatment", "biofilm_control"))
 head(resBiofilm)         
 
 alpha <- 0.05 #set alpha to 0.05, this will control FDR (FDR = adjusted p-value cutoff)
@@ -128,7 +128,7 @@ summary(resBiofilm, alpha) #now showing all genes with FRD < 0.05
 #to maximize the number of genes with padj < alpha
 
 #make a column with the set alpha value of 0.05, and save it as a new variable
-resBiofilm_05 <- results(ddsS4collapse, alpha=alpha, contrast=c("group", "biofilm_control", "biofilm_treatment"))
+resBiofilm_05 <- results(ddsS4collapse, alpha=alpha, contrast=c("group", "biofilm_treatment", "biofilm_control"))
 head(resBiofilm_05)
 
 #Collect the genes that have values lower than the alpha value of 0.05
@@ -145,7 +145,7 @@ write.csv(sig_geneIDs_S4bio, file = "sig_geneIDs_S4bio.csv")
                       
 ```
 
-Add columns to identify if genes are differentially expressed, and if so are they up or down regulated.
+## Add columns to identify if genes are differentially expressed, and if so are they up or down regulated.
 
 ```{r data identification}
 
@@ -160,6 +160,26 @@ sig_geneIDs_S4bio$diffexpressed[sig_geneIDs_S4bio$log2FoldChange < -1 & sig_gene
 
 #save as a csv file
 write.csv(sig_geneIDs_S4bio, file = "sig_geneIDs_S4bio_annotated.csv")
+```
+
+## Repeat for Planktonic Cells in Supernatant
+
+```{r resdeseqSupernatant}
+#make a column with the set alpha value of 0.05, and save it as a new variable
+resPlank_05 <- results(ddsS4collapse, alpha=alpha, contrast=c("group", "supernatant_treatment", "supernatant_control"))
+head(resPlank_05)
+
+#Collect the genes that have values lower than the alpha value of 0.05
+resPlank_05_sig <- resPlank_05[which(resPlank_05$padj < alpha),]
+head(resPlank_05_sig)
+
+summary(resPlank_05_sig) #this is the significant ones only!
+
+sig_geneIDs_S4plank <- DataFrame(resPlank_05_sig)
+
+# Save significant S4 biofilm gene IDs to a .csv file
+write.csv(sig_geneIDs_S4plank, file = "sig_geneIDs_S4Plank.csv")
+
 ```
 
 # Session info
